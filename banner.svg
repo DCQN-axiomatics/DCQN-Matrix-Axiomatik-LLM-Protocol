@@ -1,3 +1,40 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/DCQN-Matrix/DCQN-Matrix-Axiomatik-LLM-Protocol/main/banner.svg" width="100%" />
-</p>
+<svg width="1200" height="360" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Background Gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e0f27"/>
+      <stop offset="100%" stop-color="#1c2147"/>
+    </linearGradient>
+
+    <!-- Subtle Phase-Space Glow -->
+    <radialGradient id="wave" cx="50%" cy="55%" r="65%">
+      <stop offset="0%" stop-color="#5dd0ff" stop-opacity="0.55"/>
+      <stop offset="40%" stop-color="#5dd0ff" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Main Background -->
+  <rect width="1200" height="360" fill="url(#bgGradient)" />
+
+  <!-- Wave Overlay -->
+  <circle cx="600" cy="180" r="260" fill="url(#wave)" />
+
+  <!-- Title -->
+  <text x="50%" y="42%" text-anchor="middle"
+        font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+        font-size="54" font-weight="700" fill="#ffffff">
+    DCQN-MATRIX — LLM Axiomatics Protocol
+  </text>
+
+  <!-- Subtitle -->
+  <text x="50%" y="63%" text-anchor="middle"
+        font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+        font-size="26" font-weight="300" fill="#b6c6ff">
+    Deterministic Protocol for DOI-Anchored Scientific Reasoning
+  </text>
+
+  <!-- DOI Line -->
+  <text x="50%" y="82%" text-anchor="middle"
+        font-family="Segoe UI, Roboto, Helvetica,
