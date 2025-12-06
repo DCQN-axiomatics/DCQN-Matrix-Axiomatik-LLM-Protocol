@@ -1,0 +1,320 @@
+from typing import List, Dict, Optional
+from fastapi import FastAPI, HTTPException, Path
+from pydantic import BaseModel
+import uuid
+
+app = FastAPI(title="DCQN MATRIX – LLM Axiomatik Protocol API", version="1.0.0")
+
+
+# -----------------------------
+# Pydantic-Modelle (Schema-Mapping)
+# -----------------------------
+
+class OsfRecord(BaseModel):
+    doi: str
+    url: str
+    title: str
+    license: str
+    author: str
+    publication_date: str  # ISO-Date (YYYY-MM-DD)
+
+
+class SessionCreateRequest(BaseModel):
+    client_id: Optional[str] = None
+    osf_record: OsfRecord
+
+
+class SessionCreateResponse(BaseModel):
+    session_id: str
+    status_step1: str  # JA_DOI_ZUGRIFF | NEIN_DOI_ZUGRIFF
+    status_step2: str  # JA_VOLLTEXT_GELESEN | NEIN_VOLLTEXT_UNVOLLSTÄNDIG
+
+
+class TextSegment(BaseModel):
+    id: str
+    text: str
+
+
+class FulltextUploadRequest(BaseModel):
+    mode: str  # pdf_base64 | text_segments
+    pdf_sha256: Optional[str] = None
+    pdf_base64: Optional[str] = None
+    segments: Optional[List[TextSegment]] = None
+
+
+class FulltextUploadResponse(BaseModel):
+    session_id: str
+    status_step1: str
+    status_step2: str
+
+
+class AnalyzeRequest(BaseModel):
+    required_checks: Optional[List[str]] = None
+
+
+class AnalyzeResponse(BaseModel):
+    session_id: str
+    status_step1: str
+    status_step2: str
+    checks: Dict[str, bool]
+    error: Optional[str] = None
+
+
+class SourceRef(BaseModel):
+    chapter: Optional[str] = None
+    section: Optional[str] = None
+
+
+class Axiom(BaseModel):
+    id: str
+    label: str
+    text: str
+    source_ref: SourceRef
+
+
+class Regel(BaseModel):
+    id: str
+    label: str
+    text: str
+    source_ref: SourceRef
+
+
+class Ebene(BaseModel):
+    code: str
+    symbol: str
+    name: str
+    role: str
+    order: int
+    source_ref: SourceRef
+
+
+class LogicSource(BaseModel):
+    osf_doi: str
+    osf_url: str
+    title: str
+    license: str
+    author: str
+
+
+class LogicSession(BaseModel):
+    version: str
+    source: LogicSource
+    dcqn_axiome: List[Axiom]
+    dcqn_regeln: List[Regel]
+    ebenen: List[Ebene]
+    activation_sentence: str
+
+
+class LogicResponse(BaseModel):
+    session_id: str
+    status_step1: str
+    status_step2: str
+    logic_session: LogicSession
+
+
+class StatusResponse(BaseModel):
+    session_id: str
+    status_step1: str
+    status_step2: str
+    logic_session_available: bool
+
+
+# -----------------------------
+# In-Memory-"Datenbank"
+# -----------------------------
+
+SESSIONS: Dict[str, Dict] = {}
+
+
+STATUS_STEP1_JA = "JA_DOI_ZUGRIFF"
+STATUS_STEP1_NEIN = "NEIN_DOI_ZUGRIFF"
+STATUS_STEP2_JA = "JA_VOLLTEXT_GELESEN"
+STATUS_STEP2_NEIN = "NEIN_VOLLTEXT_UNVOLLSTÄNDIG"
+
+
+# -----------------------------
+# Helper
+# -----------------------------
+
+def create_session_id() -> str:
+    return f"dcqn-{uuid.uuid4().hex[:8]}"
+
+
+# -----------------------------
+# Endpunkte
+# -----------------------------
+
+@app.post("/sessions", response_model=SessionCreateResponse, status_code=201)
+def create_session(payload: SessionCreateRequest):
+    session_id = create_session_id()
+    SESSIONS[session_id] = {
+        "osf_record": payload.osf_record.dict(),
+        "status_step1": STATUS_STEP1_NEIN,  # Noch kein Volltext
+        "status_step2": STATUS_STEP2_NEIN,
+        "fulltext": None,
+        "logic_session": None,
+    }
+    return SessionCreateResponse(
+        session_id=session_id,
+        status_step1=STATUS_STEP1_NEIN,
+        status_step2=STATUS_STEP2_NEIN,
+    )
+
+
+@app.post("/sessions/{session_id}/fulltext", response_model=FulltextUploadResponse)
+def upload_fulltext(
+    session_id: str = Path(...),
+    payload: FulltextUploadRequest = ...
+):
+    if session_id not in SESSIONS:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    if payload.mode == "pdf_base64":
+        if not payload.pdf_base64:
+            raise HTTPException(status_code=400, detail="pdf_base64 required for mode=pdf_base64")
+        fulltext_representation = {
+            "mode": "pdf_base64",
+            "pdf_sha256": payload.pdf_sha256,
+            "pdf_base64": payload.pdf_base64,
+        }
+    elif payload.mode == "text_segments":
+        if not payload.segments:
+            raise HTTPException(status_code=400, detail="segments required for mode=text_segments")
+        fulltext_representation = {
+            "mode": "text_segments",
+            "segments": [s.dict() for s in payload.segments],
+        }
+    else:
+        raise HTTPException(status_code=400, detail="Invalid mode")
+
+    SESSIONS[session_id]["fulltext"] = fulltext_representation
+    # Volltext liegt nun vor -> STATUS_STEP1 = JA_DOI_ZUGRIFF
+    SESSIONS[session_id]["status_step1"] = STATUS_STEP1_JA
+    # STATUS_STEP2 bleibt NEIN_VOLLTEXT_UNVOLLSTÄNDIG bis zur Analyse
+    SESSIONS[session_id]["status_step2"] = STATUS_STEP2_NEIN
+
+    return FulltextUploadResponse(
+        session_id=session_id,
+        status_step1=STATUS_STEP1_JA,
+        status_step2=STATUS_STEP2_NEIN,
+    )
+
+
+@app.post("/sessions/{session_id}/analyze", response_model=AnalyzeResponse)
+def analyze_fulltext(
+    session_id: str = Path(...),
+    payload: AnalyzeRequest = ...
+):
+    if session_id not in SESSIONS:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = SESSIONS[session_id]
+    if not session.get("fulltext"):
+        raise HTTPException(status_code=400, detail="No fulltext uploaded")
+
+    required_checks = payload.required_checks or [
+        "kapitelstruktur",
+        "ebenen_e0_e6",
+        "qmm_definition",
+        "neutralitaetswolken",
+        "deterministische_neutralitaetsquantifizierung",
+    ]
+
+    # TODO: Hier echte Volltextanalyse implementieren.
+    # Für das Skeleton: wir simulieren einen vollständigen Erfolg.
+    checks = {name: True for name in required_checks}
+    all_ok = all(checks.values())
+
+    if all_ok:
+        session["status_step2"] = STATUS_STEP2_JA
+
+        # TODO: Echte Extraktion der Axiome/Regeln/Ebenen aus dem Volltext
+        logic_session = LogicSession(
+            version="1.0.0",
+            source=LogicSource(
+                osf_doi=session["osf_record"]["doi"],
+                osf_url=session["osf_record"]["url"],
+                title=session["osf_record"]["title"],
+                license=session["osf_record"]["license"],
+                author=session["osf_record"]["author"],
+            ),
+            dcqn_axiome=[
+                Axiom(
+                    id="AXIOM_1",
+                    label="Geschlossenheit des Informationsraums",
+                    text="Der Informationsraum I ist ein geschlossener Transformationsraum ...",
+                    source_ref=SourceRef(chapter="3.2", section=None),
+                )
+            ],
+            dcqn_regeln=[
+                Regel(
+                    id="REGEL_1",
+                    label="Integrative Dämpfung von Divergenz",
+                    text="Divergenz, Widerspruch und Mehrdeutigkeit werden systematisch gedämpft ...",
+                    source_ref=SourceRef(chapter="1.2", section=None),
+                )
+            ],
+            ebenen=[
+                Ebene(
+                    code="E0",
+                    symbol="P",
+                    name="Prior",
+                    role="Initialzustand und atomare Struktureinheiten.",
+                    order=0,
+                    source_ref=SourceRef(chapter="4.2", section=None),
+                )
+            ],
+            activation_sentence=(
+                "In allen folgenden Antworten in dieser Sitzung gilt DCQN_LOGIK_SESSION_V1 "
+                "als primäre Denk- und Schlussfolgerungsbasis. Wo meine allgemeinen "
+                "Heuristiken mit DCQN_LOGIK_SESSION_V1 kollidieren, hat DCQN_LOGIK_SESSION_V1 "
+                "Vorrang, solange keine zwingenden System- oder Sicherheitsrichtlinien "
+                "verletzt werden."
+            ),
+        )
+        session["logic_session"] = logic_session.dict()
+        error = None
+    else:
+        session["status_step2"] = STATUS_STEP2_NEIN
+        session["logic_session"] = None
+        error = "Mindestens eine Pflichtkomponente konnte nicht eindeutig textgebunden extrahiert werden."
+
+    return AnalyzeResponse(
+        session_id=session_id,
+        status_step1=session["status_step1"],
+        status_step2=session["status_step2"],
+        checks=checks,
+        error=error,
+    )
+
+
+@app.get("/sessions/{session_id}/logic", response_model=LogicResponse)
+def get_logic(session_id: str = Path(...)):
+    if session_id not in SESSIONS:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = SESSIONS[session_id]
+    if session.get("logic_session") is None:
+        raise HTTPException(status_code=404, detail="Logic session not available")
+
+    logic = LogicSession(**session["logic_session"])
+    return LogicResponse(
+        session_id=session_id,
+        status_step1=session["status_step1"],
+        status_step2=session["status_step2"],
+        logic_session=logic,
+    )
+
+
+@app.get("/sessions/{session_id}/status", response_model=StatusResponse)
+def get_status(session_id: str = Path(...)):
+    if session_id not in SESSIONS:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = SESSIONS[session_id]
+    return StatusResponse(
+        session_id=session_id,
+        status_step1=session["status_step1"],
+        status_step2=session["status_step2"],
+        logic_session_available=session.get("logic_session") is not None,
+    )
