@@ -1,6 +1,7 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/DCQN-Matrix/DCQN-Matrix-Axiomatik-LLM-Protocol/main/banner.svg" width="100%" />
+  <img src="banner.svg" width="100%" />
 </p>
+
 
 # DCQN-Matrix-Axiomatik-LLM-Protocol
 
