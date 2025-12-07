@@ -3,13 +3,12 @@
 <div align="center">
 
 [![Protocol Version](https://img.shields.io/badge/protocol-v1.0.0-blue)](./Protocol_DCQN_LLM_Prompt_V1.txt)
-[![OSF DOI](https://img.shields.io/badge/DOI-10.17605%2FOSF.IO%2FQWA6S-8A2BE2)](https://doi.org/10.17605/OSF.IO/WZ6AR)
+[![OSF DOI](https://img.shields.io/badge/DOI-10.17605%2FOSF.IO%2FWZ6AR-8A2BE2)](https://doi.org/10.17605/OSF.IO/WZ6AR)
 [![License: CC BY 4.0](https://img.shields.io/badge/license-CC%20BY%204.0-brightgreen)](./LICENSE.md)
 ![LLM Ready](https://img.shields.io/badge/LLM-ready-black)
 ![Anti-Simulation](https://img.shields.io/badge/anti--simulation-enforced-red)
 
 </div>
-
 
 ---
 
@@ -110,8 +109,8 @@ For LLM research, this gives you:
 
 ## DOI and reference
 
-- **Primary reference (OSF):** `10.17605/OSF.IO/WZ6AR`  
-- **OSF landing page:** https://osf.io/wz6ar  
+- **Primary reference (OSF Registrierung):** `10.17605/OSF.IO/WZ6AR`  
+- **OSF project landing page:** https://osf.io/qwa6s/  
 
 All axioms and rules reconstructed by the protocol must be traceable back to this DOI and to concrete sections of the original text.
 
