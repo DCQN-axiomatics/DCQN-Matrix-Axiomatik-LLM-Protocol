@@ -3,8 +3,8 @@
   "protocol_version": "1.0.0",
   "osf_primary_reference": {
     "title": "DCQN.MATRIX – Die Stimme der Neutralität",
-    "doi": "10.17605/OSF.IO/QWA6S",
-    "osf_url": "https://osf.io/qwa6s",
+    "doi": "10.17605/OSF.IO/WZ6AR",
+    "osf_url": "https://osf.io/wz6ar",
     "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
     "author": "Benjamin Hupe",
     "publication_date": "2025-12-03"
@@ -24,7 +24,7 @@
   "llm_execution_protocol": {
     "step_1": {
       "name": "DOI-Check",
-      "expected_input": "OSF DOI 10.17605/OSF.IO/QWA6S",
+      "expected_input": "OSF DOI 10.17605/OSF.IO/WZ6AR",
       "expected_output": [
         "STATUS_STEP1 = JA_DOI_ZUGRIFF",
         "oder",
