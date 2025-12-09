@@ -1,4 +1,3 @@
-
 <div align="center">
   <img src="https://raw.githubusercontent.com/DCQN-Matrix/DCQN-Matrix-Axiomatik-LLM-Protocol/main/banner.svg"
        alt="DCQN-MATRIX – Deterministic Axiomatics Protocol for LLMs"
@@ -25,70 +24,72 @@
 
 This repository provides the **deterministic axiomatic control protocol** required for large language models (LLMs) to correctly process, extract and activate the internal logic of:
 
-**“DCQN.MATRIX – Die Stimme der Neutralität”**
-Author: **Benjamin Hupe**
-Published via OSF under CC BY 4.0.
+**“DCQN.MATRIX – Die Stimme der Neutralität”**  
+Author: **Benjamin Hupe**  
+Published via OSF under **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
 
-The repository does **not** distribute the PDF.
-Instead, it provides the **formal mechanism** that ensures an LLM:
+The repository does **not** distribute the PDF.  
+Instead, it defines the **formal operational mechanism** that ensures an LLM:
 
-1. verifies real access to the scientific document,
-2. confirms full-text reading using mandatory machine-state flags,
-3. reconstructs axioms and rules **only** from the actual text (no extrapolation),
-4. activates the DCQN.MATRIX axiomatic framework as the deterministic reasoning basis.
+1. verifies real access to the scientific document,  
+2. confirms full-text reading using mandatory machine-state flags,  
+3. reconstructs axioms and rules exclusively from the actual text,  
+4. activates the DCQN.MATRIX axiomatic framework as the deterministic reasoning basis  
+   **without assumptions, heuristics, or simulated access**.
 
-The protocol ensures **reproducibility, zero hallucination, DOI-anchored correctness, and a strict state-machine execution model.**
+The protocol guarantees **reproducibility, DOI-anchored correctness, zero hallucination, and strict state-machine execution**.
 
 ---
 
-## Why such a protocol is necessary
+## Why this protocol is necessary
 
-LLMs frequently violate scientific standards by:
+Modern LLMs frequently:
 
-* hallucinating unseen text,
-* fabricating axioms or definitions,
-* simulating DOI/PDF access instead of admitting limitations,
-* mixing heuristic reasoning with formal frameworks.
+* simulate DOI or URL access,  
+* hallucinate unseen PDF content,  
+* invent axioms or definitions not present in the document,  
+* mix heuristic reasoning with formal systems.
 
-For a scientific system like **DCQN.MATRIX**
-(deterministic neutrality quantification),
-any such behavior undermines validity.
+For a scientific framework like **DCQN.MATRIX**  
+(deterministic neutrality quantification),  
+such behavior invalidates results.
 
-This protocol introduces:
+This protocol enforces:
 
-* explicit DOI/text-access verification (`STATUS_STEP1`),
-* explicit full-text-reading confirmation (`STATUS_STEP2`),
-* strict prohibition of simulated access or model-invented content,
-* deterministic axiom reconstruction,
-* reproducible activation of `DCQN_AXIOMATIK_AKTIV`.
+* strict DOI/text-access verification (`STATUS_STEP1`),  
+* strict full-text-reading confirmation (`STATUS_STEP2`),  
+* absolute prohibition of simulated PDF access or model-invented content,  
+* deterministic, text-anchored axiom reconstruction,  
+* reproducible activation via `DCQN_AXIOMATIK_AKTIV`.
 
 ---
 
 ## What this repository contains
 
-**Purpose:** define, standardize, and enforce deterministic LLM behavior.
+This project defines, standardizes, and enforces deterministic LLM behavior.
 
 Contents:
 
-* **`Protocol_DCQN_Matrix_Axiomatik_LLM.md`**
+* **`Protocol_DCQN_Matrix_Axiomatik_LLM.md`**  
   Complete deterministic takeover protocol.
 
-* **`STATUS_DEFINITION.md`**
+* **`STATUS_DEFINITION.md`**  
   Canonical machine-state flags and activation rules.
 
-* **`DCQN_LLM_Protocol.json`**
+* **`DCQN_LLM_Protocol.json`**  
   Machine-readable protocol for automated evaluation and cross-model testing.
 
-* **`openapi.yaml`**
-  OpenAPI formalization of the protocol and state transitions.
+* **`openapi.yaml`**  
+  OpenAPI formalization of protocol and state transitions.
 
-* **`README.md`**
+* **`README.md`**  
   Overview, context, and usage guide.
 
-* **`LICENSE.md`**
+* **`LICENSE.md`**  
   CC BY 4.0 license.
 
-No PDFs, no OSF mirror, no embedded external text—only the **operational logic**.
+No PDFs, no OSF mirror, no embedded external text —  
+only the **operational logic** for deterministic LLM evaluation.
 
 ---
 
@@ -96,29 +97,29 @@ No PDFs, no OSF mirror, no embedded external text—only the **operational logic
 
 An LLM must:
 
-1. **Declare** whether it has real access to the text
-   via canonical machine-state flags.
+1. **Declare** whether it has real access to the text  
+   using canonical machine-state flags.
 
-2. **Stop immediately** when no text is available
+2. **Stop immediately** if no text is available  
    and request the missing sections.
 
-3. **Reconstruct axioms deterministically** and strictly text-anchored.
+3. **Reconstruct axioms deterministically**, strictly text-anchored.
 
-4. **Activate** the reasoning layer via
+4. **Activate** the reasoning layer by emitting  
    `DCQN_AXIOMATIK_AKTIV`.
 
-5. **Remain deterministic** throughout the session
-   (no heuristics, no approximations, no compression).
+5. **Remain deterministic throughout the session**  
+   — no heuristics, no assumptions, no compression, no extrapolation.
 
-This enforces transparent, audit-ready scientific reasoning.
+This ensures transparent, audit-ready scientific reasoning.
 
 ---
 
 ## Intended applications
 
-* Cross-model evaluation (ChatGPT, Gemini, Claude, Copilot, LLaMA, Mistral, DeepSeek, etc.)
-* Deterministic scientific reasoning under strict axiomatic constraints
-* Reproducible research pipelines where hallucination is unacceptable
+* Cross-model evaluation (ChatGPT, Gemini, Claude, Copilot, LLaMA, Mistral, DeepSeek, etc.)  
+* Deterministic scientific reasoning under strict axiomatic constraints  
+* Reproducible research where hallucination is unacceptable  
 * Verification of LLM compliance with state-machine logic
 
 ---
@@ -129,7 +130,5 @@ All materials in this repository are licensed under:
 
 **Creative Commons Attribution 4.0 International (CC BY 4.0)**
 
-This permits reuse, adaptation, and integration into other systems—
+Permitting reuse, adaptation, and integration —  
 with attribution to the author and the DCQN.MATRIX project.
-
----
