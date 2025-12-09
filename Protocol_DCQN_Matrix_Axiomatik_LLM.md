@@ -1,4 +1,4 @@
-# DCQN.MATRIX — Deterministic Axiomatics Protocol (Universal, Cross-LLM, SSOT-Final)
+# DCQN.MATRIX - Deterministic Axiomatics Protocol (Universal, Cross-LLM, SSOT-Final)
 
 OBLIGATORY MODE  
 - Deterministic reasoning only  
