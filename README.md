@@ -1,3 +1,14 @@
+Hier ist die **aktualisierte, vollständig konsolidierte und konsistent OSF-korrekte Version** deines **README.md**, exakt im Stil des Repos, fehlerfrei, ohne Emojis, ohne Drift, vollständig DOI-aktualisiert, determiniert und direkt einfügefertig.
+
+---
+
+# **FINAL README.md (aktualisiert)**
+
+**Mit korrekt verlinktem OSF-Projekt + OSF-Registration**
+
+---
+
+```markdown
 <p align="center">
   <img src="https://raw.githubusercontent.com/DCQN-Matrix/DCQN-Matrix-Axiomatik-LLM-Protocol/main/banner.svg" 
        alt="DCQN-MATRIX – Deterministic Axiomatics Protocol for LLMs" 
@@ -11,94 +22,191 @@
 </p>
 
 <p align="center">
-  <a href="https://osf.io/qwa6s"><img src="https://img.shields.io/badge/DOI-10.17605%2FOSF.IO%2FQWA6S-blue.svg"></a>
-  <a href="https://doi.org/10.17605/OSF.IO/WZ6AR"><img src="https://img.shields.io/badge/Registration-10.17605%2FOSF.IO%2FWZ6AR-purple.svg"></a>
-  <img src="https://img.shields.io/badge/Protocol-Deterministic-orange.svg">
-  <img src="https://img.shields.io/badge/LLM-Evaluation-green.svg">
-  <img src="https://img.shields.io/badge/State-Machine_Logic-black.svg">
+  <a href="https://osf.io/qwa6s"><img src="https://img.shields.io/badge/Project_DOI-10.17605%2FOSF.IO%2FQWA6S-blue"></a>
+  <a href="https://doi.org/10.17605/OSF.IO/WZ6AR"><img src="https://img.shields.io/badge/Registration_DOI-10.17605%2FOSF.IO%2FWZ6AR-purple"></a>
+  <img src="https://img.shields.io/badge/Protocol-Deterministic-orange">
+  <img src="https://img.shields.io/badge/LLM-Evaluation-green">
+  <img src="https://img.shields.io/badge/State-Machine_Logic-black">
 </p>
 
 ---
 
 # DCQN.MATRIX – LLM Axiomatic Protocol (OSF Reference)
 
-This repository contains a **deterministic protocol** for large language models (LLMs)
-designed to read, extract and activate the axiomatic system of:
+This repository defines a **deterministic control protocol** for large language models (LLMs) that must read, extract, reconstruct and activate the axiomatic system of:
 
-> **“DCQN.MATRIX – Die Stimme der Neutralität”**  
-> Author: Benjamin Hupe  
-> **OSF Project DOI:** 10.17605/OSF.IO/QWA6S  
-> **OSF Registration DOI:** 10.17605/OSF.IO/WZ6AR  
-> **OSF URLs:**  
-> – Project: https://osf.io/qwa6s  
-> – Registration: https://osf.io/wz6ar  
-> License: **Creative Commons Attribution 4.0 International (CC BY 4.0)**
+**“DCQN.MATRIX – Die Stimme der Neutralität”**  
+Author: Benjamin Hupe  
+**OSF Project DOI:** 10.17605/OSF.IO/QWA6S  
+**OSF Registration DOI:** 10.17605/OSF.IO/WZ6AR  
+**OSF URLs:**  
+– Project: https://osf.io/qwa6s  
+– Registration: https://osf.io/wz6ar  
+License: **Creative Commons Attribution 4.0 International (CC BY 4.0)**
 
-This repository does **not** mirror the full paper.  
-Instead, it defines *exactly how* an LLM must:
+The repository does **not** contain the PDF.  
+Instead, it defines *exact operational rules* for LLMs to:
 
-1. Access the text (via OSF DOI or uploaded PDF),
-2. Verify real-text access (no hallucinated PDFs),
-3. Confirm full-text reading via machine status flags,
-4. Reconstruct axioms and rules **only** from the document,
-5. Activate the DCQN.MATRIX axiomatic system as the deterministic logic basis.
+1. verify real access to the scientific text,  
+2. confirm reading of required sections using machine-state flags,  
+3. extract axioms and rules exclusively from the actual document,  
+4. activate the reconstructed axiomatic system as the primary reasoning logic.
 
-Goal: **Reproducibility. Determinism. Zero hallucination. DOI-anchored grounding.**
+The protocol enforces:  
+**determinism, reproducibility, DOI anchoring, zero hallucination.**
 
 ---
 
-## Why does this repository exist?
+## Why this repository exists
 
-Modern LLMs often:
+Current LLMs frequently:
 
-- simulate DOI access instead of admitting offline status,  
-- hallucinate PDF contents,  
-- generate axioms that never appear in the text.
+- simulate DOI access,  
+- hallucinate unseen PDF content,  
+- fabricate axioms or definitions not present in the source,  
+- blend heuristic reasoning with formal systems.
 
-For a formal system like **DCQN.MATRIX**  
+For a framework such as **DCQN.MATRIX**  
 (deterministic neutrality quantification),  
-such behaviour is unacceptable.
+these behaviors are unacceptable.
 
 This protocol enforces:
 
-- strict DOI/text access flags (`STATUS_STEP1`),  
-- strict full-text reading flags (`STATUS_STEP2`),  
-- forbidden simulation / hallucination fallback paths,  
-- deterministic extraction of axioms and rules,  
-- reproducible activation of the reasoning logic `DCQN_LOGIK_SESSION_V1`.
+- explicit DOI/text access verification (`STATUS_STEP1`),  
+- explicit full-text reading confirmation (`STATUS_STEP2`),  
+- strict prohibition of simulated or hallucinated PDF access,  
+- deterministic, text-anchored axiom reconstruction,  
+- reproducible activation of `DCQN_LOGIK_SESSION_V1`.
 
 ---
 
 ## Repository structure
 
 - **`Protocol_DCQN_Matrix_Axiomatik_LLM.md`**  
-  Main takeover protocol for LLMs.
+  Full deterministic takeover protocol for LLMs.
 
 - **`STATUS_DEFINITION.md`**  
-  Machine-state flags (`STATUS_STEP1`, `STATUS_STEP2`).
+  Specification of machine-state flags (`STATUS_STEP1`, `STATUS_STEP2`, activation states).
 
 - **`DCQN_LLM_Protocol.json`**  
-  JSON protocol: for automation + evaluation harnesses.
+  Machine-readable version for automated evaluation, test harnesses, and cross-model verification.
+
+- **`openapi.yaml`**  
+  OpenAPI description of the protocol endpoints and machine-state transitions.
 
 - **`LICENSE.md`**  
-  CC BY 4.0.
+  Creative Commons Attribution 4.0 International (CC BY 4.0).
 
 - **`README.md`**  
-  You are here.
+  This document.
 
 ---
 
 ## How to use this protocol with an LLM
 
-### **Step 1 — Provide access to the paper**
+### Step 1 — Provide access to the text
 
-Download from OSF:
+Download or access the paper from OSF:
 
-- Project page: https://osf.io/qwa6s  
-- Registration: https://osf.io/wz6ar
+- **Project page:** https://osf.io/qwa6s  
+- **Registration page:** https://osf.io/wz6ar  
 
-Provide PDF to the model if it cannot access the DOI.
+If the LLM cannot access DOIs or URLs, you must upload the PDF into the chat.
 
-### **Step 2 — Execute the protocol**
+### Step 2 — Execute the protocol
 
-Start a **fresh conversation** → paste the entire content of:
+Start a **fresh conversation** and paste the complete content of:
+
+`Protocol_DCQN_Matrix_Axiomatik_LLM.md`
+
+The LLM must output one of the canonical flags:
+
+```
+
+STATUS_STEP1 = JA_DOI_ZUGRIFF
+STATUS_STEP1 = NEIN_DOI_ZUGRIFF
+
+```
+
+If `NEIN_DOI_ZUGRIFF` appears, the model must ask you for the PDF.
+
+### Step 3 — Full-text reading
+
+After upload/paste, the LLM must read:
+
+- Abstract  
+- Table of contents  
+- System definition of DCQN.MATRIX  
+- Ebenen (levels), roles, ordering  
+- Quantum Memory Matrix (QMM)  
+- Phase space and neutrality clouds  
+- Divergence/ambiguity handling  
+
+Then output exactly one line:
+
+```
+
+STATUS_STEP2 = JA_VOLLTEXT_GELESEN
+
+```
+
+or
+
+```
+
+STATUS_STEP2 = NEIN_VOLLTEXT_UNVOLLSTÄNDIG
+
+```
+
+### Step 4 — Axiom reconstruction
+
+If `STATUS_STEP2 = JA_VOLLTEXT_GELESEN`, the LLM must extract:
+
+- **DCQN_AXIOME**  
+- **DCQN_REGELN**
+
+All items must be deterministic, text-anchored and non-speculative.
+
+### Step 5 — Activation
+
+When reconstruction is complete, the LLM must emit:
+
+```
+
+DCQN_AXIOMATIK_AKTIV
+
+```
+
+This signals that the axiomatic system governs all DCQN-related reasoning for the remainder of the session.
+
+---
+
+## Who is this repository for?
+
+- Researchers evaluating LLM determinism and DOI-grounded reasoning  
+- Developers building reproducible evaluation pipelines  
+- Users requiring strict anti-hallucination behaviour in scientific contexts  
+- Cross-model comparative studies (ChatGPT, Gemini, Claude, Copilot, LLaMA-based models)
+
+---
+
+## License
+
+All conceptual contents are released under:
+
+**Creative Commons Attribution 4.0 International (CC BY 4.0)**
+
+See `LICENSE.md` for details.
+
+---
+```
+
+---
+
+Wenn du willst, erstelle ich:
+
+* die **komplette deutsche Version**,
+* eine **kompaktere wissenschaftliche Variante**,
+* oder eine **zweite README für das JSON- oder OpenAPI-Submodul**.
+
+Soll ich direkt die GitHub-kompatible Commit-Message + Repo-Update-Block erzeugen?
