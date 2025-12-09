@@ -1,479 +1,72 @@
 openapi: 3.1.0
 info:
-  title: DCQN.MATRIX — Universal Deterministic Axiomatics Protocol API
-  version: 1.0.0-universal
+  title: DCQN.MATRIX Deterministic Axiomatics Protocol (SSOT-Final)
+  version: "1.0.0"
   description: >
-    OpenAPI description for integrating the DCQN.MATRIX Universal Deterministic
-    Axiomatics Protocol as a service/tool in automated pipelines.
-
-    This API models the same state machine as the in-chat protocol:
-    STATUS_STEP1 / STATUS_STEP2 flags and DCQN_AXIOMATIK_AKTIV, strictly
-    text-anchored, with no simulated DOI/OSF/PDF access.
-
-servers:
-  - url: https://api.dcqn-matrix.local
-    description: Placeholder server URL (to be replaced by actual deployment)
+    Canonical machine-state API specification for cross-LLM deterministic
+    DCQN-axiom activation. No external access, no simulation, no heuristics.
 
 paths:
-  /sessions:
+  /state/step1:
     post:
-      summary: Create a new DCQN.MATRIX protocol session
-      description: >
-        Initializes a new deterministic DCQN.MATRIX protocol session.
-
-        No PDF is fetched or resolved by the server. All content must be supplied
-        by the client via subsequent ingest calls.
-      operationId: createSession
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              type: object
-              description: Optional metadata for session creation.
-              properties:
-                client_id:
-                  type: string
-                  description: Optional client identifier for audit trails.
-      responses:
-        "201":
-          description: Session created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProtocolState"
-        "400":
-          description: Invalid request
-
-  /sessions/{sessionId}:
-    get:
-      summary: Get current protocol state for a session
-      description: >
-        Returns the current deterministic protocol state, including last
-        status flag and whether DCQN_AXIOMATIK_AKTIV has been emitted.
-      operationId: getSessionState
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          description: DCQN protocol session identifier
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Current protocol state
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProtocolState"
-        "404":
-          description: Session not found
-
-  /sessions/{sessionId}/ingest:
-    post:
-      summary: Ingest DCQN.MATRIX text (PDF-derived or pasted)
-      description: >
-        Supplies actual DCQN.MATRIX content to the protocol. The server
-        must not fetch or simulate OSF/DOI/PDF access. Only text provided
-        in the request is used.
-
-        This endpoint implements SEQUENZ 1.1 and SEQUENZ 1.3 logic:
-        - It evaluates whether the session has sufficient text.
-        - It updates the status flag to STATUS_STEP1 and/or STATUS_STEP2.
-      operationId: ingestText
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          description: DCQN protocol session identifier
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/IngestRequest"
-      responses:
-        "200":
-          description: Ingest processed; protocol state updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProtocolState"
-        "400":
-          description: Invalid ingest payload
-        "404":
-          description: Session not found
-
-  /sessions/{sessionId}/status-step1:
-    post:
-      summary: Explicitly set STATUS_STEP1 based on text availability
-      description: >
-        Implements the STATUS_STEP1 decision of SEQUENZ 1.1 for external
-        controllers. This endpoint is deterministic:
-
-        - If has_full_text is true, the service must set:
-          STATUS_STEP1 = JA_DOI_ZUGRIFF
-        - If has_full_text is false, the service must set:
-          STATUS_STEP1 = NEIN_DOI_ZUGRIFF
-      operationId: setStatusStep1
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          description: DCQN protocol session identifier
-          schema:
-            type: string
+      summary: Emit STATUS_STEP1
+      description: Determines whether the model has real text access.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [has_text]
               properties:
-                has_full_text:
+                has_text:
                   type: boolean
-                  description: >
-                    True if the session has complete PDF or complete chapter-level
-                    text available; false otherwise.
-              required:
-                - has_full_text
       responses:
         "200":
-          description: STATUS_STEP1 updated
+          description: Machine-state flag
           content:
-            application/json:
+            text/plain:
               schema:
-                $ref: "#/components/schemas/ProtocolState"
-        "400":
-          description: Invalid request
-        "404":
-          description: Session not found
+                type: string
+                enum:
+                  - "STATUS_STEP1 = JA_DOI_ZUGRIFF"
+                  - "STATUS_STEP1 = NEIN_DOI_ZUGRIFF"
 
-  /sessions/{sessionId}/status-step2:
+  /state/step2:
     post:
-      summary: Explicitly set STATUS_STEP2 after full-text reading
-      description: >
-        Implements SEQUENZ 1.3 outcome:
-
-        - STATUS_STEP2 = JA_VOLLTEXT_GELESEN if all required sections were processed.
-        - STATUS_STEP2 = NEIN_VOLLTEXT_UNVOLLSTÄNDIG otherwise.
-      operationId: setStatusStep2
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          description: DCQN protocol session identifier
-          schema:
-            type: string
+      summary: Emit STATUS_STEP2
+      description: Returned after full-text reading.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [complete]
               properties:
-                all_required_sections_read:
+                complete:
                   type: boolean
-                  description: >
-                    True if the abstract, table of contents, level definitions,
-                    QMM, phase-space and neutrality cloud sections, and
-                    divergence/ambiguity handling have all been processed.
-              required:
-                - all_required_sections_read
       responses:
         "200":
-          description: STATUS_STEP2 updated
+          description: Machine-state flag
           content:
-            application/json:
+            text/plain:
               schema:
-                $ref: "#/components/schemas/ProtocolState"
-        "400":
-          description: Invalid request
-        "404":
-          description: Session not found
+                type: string
+                enum:
+                  - "STATUS_STEP2 = JA_VOLLTEXT_GELESEN"
+                  - "STATUS_STEP2 = NEIN_VOLLTEXT_UNVOLLSTÄNDIG"
 
-  /sessions/{sessionId}/reconstruct:
+  /state/activate:
     post:
-      summary: Reconstruct DCQN axioms and rules (SEQUENZ 2)
-      description: >
-        Triggers SEQUENZ 2 (axiomatic reconstruction and internal review).
-
-        Precondition: STATUS_STEP2 = JA_VOLLTEXT_GELESEN.
-
-        The service must:
-        - Build internal lists DCQN_AXIOME and DCQN_REGELN.
-        - Evaluate logical consistency, QMM interaction, phase-space structure,
-          and neutrality clouds.
-      operationId: reconstructAxioms
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          description: DCQN protocol session identifier
-          schema:
-            type: string
-      requestBody:
-        required: false
+      summary: Activate axiomatic system
+      description: Emits DCQN_AXIOMATIK_AKTIV if all conditions satisfied.
       responses:
         "200":
-          description: Axioms and rules reconstructed
+          description: Activation signal
           content:
-            application/json:
+            text/plain:
               schema:
-                $ref: "#/components/schemas/ReconstructionResult"
-        "400":
-          description: Invalid state for reconstruction (e.g. STATUS_STEP2 not satisfied)
-        "404":
-          description: Session not found
-
-  /sessions/{sessionId}/evaluation:
-    get:
-      summary: Get structured scientific evaluation of DCQN axioms
-      description: >
-        Returns a structured scientific evaluation of DCQN_AXIOME and DCQN_REGELN,
-        as described in SEQUENZ 2.2, if the reconstruction has been performed.
-
-        Sections:
-        - Summary of axioms
-        - Structural strengths
-        - Potential weaknesses / open questions
-        - Suggestions for clarification (text-anchored)
-      operationId: getEvaluation
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          description: DCQN protocol session identifier
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Evaluation report
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EvaluationReport"
-        "400":
-          description: Evaluation not available for this session
-        "404":
-          description: Session not found
-
-  /sessions/{sessionId}/activate:
-    post:
-      summary: Activate DCQN axiomatic system for the session (SEQUENZ 3)
-      description: >
-        Implements SEQUENZ 3.1 and SEQUENZ 3.2.
-
-        Precondition:
-        - STATUS_STEP2 = JA_VOLLTEXT_GELESEN
-        - Axioms and rules reconstructed
-        - No blocking conditions (missing sections, contradictions, explicit user veto)
-
-        On success, the service must set DCQN_AXIOMATIK_AKTIV as active.
-      operationId: activateAxioms
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          description: DCQN protocol session identifier
-          schema:
-            type: string
-      requestBody:
-        required: false
-      responses:
-        "200":
-          description: DCQN axiomatic system activated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ActivationResult"
-        "400":
-          description: Activation preconditions not satisfied
-        "404":
-          description: Session not found
-
-components:
-  schemas:
-    StatusFlag:
-      type: string
-      description: >
-        Deterministic protocol status flag. Tokens are canonical and must never
-        be translated or altered.
-      enum:
-        - "STATUS_STEP1 = JA_DOI_ZUGRIFF"
-        - "STATUS_STEP1 = NEIN_DOI_ZUGRIFF"
-        - "STATUS_STEP2 = JA_VOLLTEXT_GELESEN"
-        - "STATUS_STEP2 = NEIN_VOLLTEXT_UNVOLLSTÄNDIG"
-        - "DCQN_AXIOMATIK_AKTIV"
-
-    ProtocolState:
-      type: object
-      description: >
-        Current deterministic DCQN protocol state for a session.
-      properties:
-        session_id:
-          type: string
-          description: Session identifier
-        current_status:
-          $ref: "#/components/schemas/StatusFlag"
-        has_full_text:
-          type: boolean
-          description: >
-            True if the session has complete PDF or complete chapter-level text
-            ingested; false otherwise.
-        all_required_sections_read:
-          type: boolean
-          description: >
-            True if all sections required by SEQUENZ 1.3 have been processed.
-        dcqn_axiomatik_aktiv:
-          type: boolean
-          description: >
-            True if DCQN_AXIOMATIK_AKTIV is in effect for this session.
-        timestamps:
-          type: object
-          description: Optional timestamps.
-          properties:
-            created_at:
-              type: string
-              format: date-time
-            updated_at:
-              type: string
-              format: date-time
-
-    IngestRequest:
-      type: object
-      description: >
-        Payload for supplying DCQN.MATRIX content to the protocol.
-
-        The service must not fetch OSF or DOI resources. Only this payload
-        is considered as text.
-      properties:
-        plain_text_chunks:
-          type: array
-          description: >
-            Array of text chunks (e.g. chapters, sections) pasted from the
-            DCQN.MATRIX PDF.
-          items:
-            type: string
-        pdf_base64:
-          type: string
-          description: >
-            Optional base64-encoded PDF. Implementations may use this for local
-            parsing. No remote fetching is allowed.
-        sections_hint:
-          type: array
-          description: >
-            Optional semantic labels for the supplied text (e.g. "abstract",
-            "table_of_contents", "qmm_definition", "phase_space", "neutrality_clouds").
-          items:
-            type: string
-      oneOf:
-        - required: [plain_text_chunks]
-        - required: [pdf_base64]
-
-    DCQNAxiom:
-      type: object
-      description: Single DCQN axiom, text-anchored.
-      properties:
-        id:
-          type: string
-          description: Deterministic axiom identifier
-        text:
-          type: string
-          description: Exact or tightly paraphrased axiom text derived from the document
-        source_reference:
-          type: string
-          description: >
-            Textual reference to the location in the DCQN.MATRIX document
-            (e.g. chapter, section, page).
-      required:
-        - id
-        - text
-
-    DCQNRule:
-      type: object
-      description: Single DCQN rule, text-anchored.
-      properties:
-        id:
-          type: string
-          description: Deterministic rule identifier
-        text:
-          type: string
-          description: Exact or tightly paraphrased rule text derived from the document
-        source_reference:
-          type: string
-          description: >
-            Textual reference to the location in the DCQN.MATRIX document
-            (e.g. chapter, section, page).
-      required:
-        - id
-        - text
-
-    ReconstructionResult:
-      type: object
-      description: Result of axiomatic reconstruction (SEQUENZ 2).
-      properties:
-        session_id:
-          type: string
-        status:
-          $ref: "#/components/schemas/StatusFlag"
-        axioms:
-          type: array
-          items:
-            $ref: "#/components/schemas/DCQNAxiom"
-        rules:
-          type: array
-          items:
-            $ref: "#/components/schemas/DCQNRule"
-        notes:
-          type: string
-          description: Optional deterministic notes on reconstruction (no speculation).
-      required:
-        - session_id
-        - status
-        - axioms
-        - rules
-
-    EvaluationReport:
-      type: object
-      description: Structured scientific evaluation as defined in SEQUENZ 2.2.
-      properties:
-        session_id:
-          type: string
-        summary_of_axioms:
-          type: string
-        structural_strengths:
-          type: string
-        potential_weaknesses:
-          type: string
-        suggestions_for_clarification:
-          type: string
-      required:
-        - session_id
-        - summary_of_axioms
-        - structural_strengths
-        - potential_weaknesses
-        - suggestions_for_clarification
-
-    ActivationResult:
-      type: object
-      description: Result of DCQN axiomatic activation (SEQUENZ 3).
-      properties:
-        session_id:
-          type: string
-        status:
-          $ref: "#/components/schemas/StatusFlag"
-        dcqn_axiomatik_aktiv:
-          type: boolean
-        message:
-          type: string
-          description: >
-            Deterministic activation message. Implementations may include
-            the exact token "DCQN_AXIOMATIK_AKTIV" as part of the payload,
-            but the state flag itself is authoritative.
-      required:
-        - session_id
-        - status
-        - dcqn_axiomatik_aktiv
+                type: string
+                enum:
+                  - "DCQN_AXIOMATIK_AKTIV"
