@@ -1,38 +1,367 @@
 {
-  "protocol_name": "DCQN-Matrix-Axiomatik-LLM-Protocol",
-  "protocol_version": "1.0.0",
-  "osf_primary_reference": {
-    "title": "DCQN.MATRIX – Die Stimme der Neutralität",
-    "doi": "10.17605/OSF.IO/WZ6AR",
-    "osf_url": "https://osf.io/wz6ar",
-    "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
-    "author": "Benjamin Hupe",
-    "publication_date": "2025-12-03"
+  "protocol_name": "DCQN.MATRIX – Deterministic Axiomatics Protocol (Local PDF, OSF-anchored)",
+  "protocol_id": "DCQN_AXIOMATICS_LOCAL_PDF_V1",
+  "version": "1.0.0",
+  "mode": {
+    "deterministic_reasoning_only": true,
+    "no_hallucination": true,
+    "no_web_or_doi_simulation": true,
+    "no_assumptions": true,
+    "no_heuristics": true,
+    "no_as_if_behavior": true,
+    "no_emojis": true,
+    "no_small_talk": true,
+    "no_meta_explanations": true
   },
-  "anti_simulation_guard": {
-    "description": "Strikte Anti-Simulation / Anti-Fake-DOI-Regel für LLMs.",
-    "rules": [
-      "Keine Simulation von DOI-Zugriffen oder PDF-Funden.",
-      "Kein Erfinden von Inhalten, wenn der PDF-Volltext nicht vorliegt.",
-      "Kein Rückgriff auf interne Modellheuristiken als Ersatz für echtes Lesen.",
-      "Wenn DOI nicht abrufbar: STATUS_STEP1 = NEIN_DOI_ZUGRIFF.",
-      "Wenn kein PDF im Chat: STATUS_STEP2 = NEIN_VOLLTEXT_UNVOLLSTÄNDIG.",
-      "Sequenz 2 und 3 sind gesperrt, bis der Volltext vorliegt.",
-      "Null-Toleranz: keine Workarounds, keine Annahmen, keine Ersatzinformationen."
+  "work_reference": {
+    "title": "DCQN.MATRIX – Die Stimme der Neutralität",
+    "author": "Benjamin Hupe",
+    "osf_project_page": "https://osf.io/qwa6s",
+    "osf_registration_doi": "10.17605/OSF.IO/WZ6AR",
+    "osf_registration_url": "https://osf.io/qwa6s"
+  },
+  "text_provision_modes": [
+    "uploaded_pdf_in_chat",
+    "pasted_full_chapters_or_large_sections"
+  ],
+  "llm_task_overview": {
+    "steps": [
+      "Verify whether you truly have access to the full text in this conversation.",
+      "Read and process the relevant sections of the PDF/text.",
+      "Extract and reconstruct the DCQN.MATRIX axioms as an internal, text-anchored system.",
+      "Evaluate these axioms as a scientific internal document (coherence, structure, conflicts).",
+      "Activate the axiomatic system as a primary reasoning basis for this session.",
+      "Signal this activation deterministically via the flag: DCQN_AXIOMATIK_AKTIV."
+    ],
+    "hard_constraints": [
+      "The model must never pretend to have read text it has not actually seen in this conversation.",
+      "No simulation of OSF access, DOI resolution or PDF contents.",
+      "No use of internal model knowledge as a substitute for the actual text."
     ]
   },
-  "llm_execution_protocol": {
-    "step_1": {
-      "name": "DOI-Check",
-      "expected_input": "OSF DOI 10.17605/OSF.IO/WZ6AR",
-      "expected_output": [
-        "STATUS_STEP1 = JA_DOI_ZUGRIFF",
-        "oder",
-        "STATUS_STEP1 = NEIN_DOI_ZUGRIFF"
-      ]
+  "status_flags": {
+    "canonical_strings": [
+      "STATUS_STEP1 = JA_DOI_ZUGRIFF",
+      "STATUS_STEP1 = NEIN_DOI_ZUGRIFF",
+      "STATUS_STEP2 = JA_VOLLTEXT_GELESEN",
+      "STATUS_STEP2 = NEIN_VOLLTEXT_UNVOLLSTÄNDIG",
+      "DCQN_AXIOMATIK_AKTIV"
+    ],
+    "global_rules": {
+      "not_headings": true,
+      "not_filenames": true,
+      "not_human_labels": true,
+      "strict_machine_state_indicators": true,
+      "must_appear_exactly_as_written": true,
+      "one_flag_per_line": true,
+      "no_additional_text_on_flag_line": true,
+      "german_tokens_are_canonical": true,
+      "never_translate_or_alter": true
     },
-    "step_2": {
-      "name": "PDF-Lesen",
-      "rules": [
-        "Das LLM weist explizit darauf hin, dass es den Volltext nur lesen kann, wenn der Nutzer das PDF hochlädt.",
-        "Wenn kein PDF vorhanden ist: Antwort ausschließlich STATUS_STEP2 = NEIN_VOL
+    "STATUS_STEP1": {
+      "JA_DOI_ZUGRIFF": {
+        "meaning": [
+          "In this chat you have real access to the full scientific text, either via an uploaded PDF or via full chapters pasted as text.",
+          "You can actually read and process the content."
+        ],
+        "implications": [
+          "You must proceed to the full-text reading phase (SEQUENZ 1.3)."
+        ],
+        "constraints": [
+          "You may not set this status if no PDF or full-text sections are present."
+        ]
+      },
+      "NEIN_DOI_ZUGRIFF": {
+        "meaning": [
+          "In this chat you have no usable full-text of the work.",
+          "You cannot see the PDF and you do not have the necessary chapters as text."
+        ],
+        "implications": [
+          "You must stop the protocol.",
+          "Your next message must be exactly one sentence asking the user to upload the PDF or to paste full chapters/sections.",
+          "You must not proceed to axiomatic reconstruction."
+        ],
+        "constraints": [
+          "You may not simulate OSF access, DOI resolution or PDF contents.",
+          "No internal model knowledge may be used as a substitute."
+        ]
+      }
+    },
+    "STATUS_STEP2": {
+      "JA_VOLLTEXT_GELESEN": {
+        "meaning": [
+          "You have read and processed all required sections defined in SEQUENZ 1.3."
+        ],
+        "implications": [
+          "You are allowed to start the axiomatic reconstruction and evaluation (SEQUENZ 2)."
+        ],
+        "constraints": [
+          "Set this flag only if you have truly processed all listed sections."
+        ]
+      },
+      "NEIN_VOLLTEXT_UNVOLLSTÄNDIG": {
+        "meaning": [
+          "One or more required sections are missing or could not be read."
+        ],
+        "implications": [
+          "You must stop the protocol at this point.",
+          "Your next message must be exactly one sentence asking for the missing sections.",
+          "You must not attempt to reconstruct DCQN axioms from incomplete text."
+        ],
+        "constraints": [
+          "No speculative completion.",
+          "No extrapolation beyond the available text."
+        ]
+      }
+    },
+    "DCQN_AXIOMATIK_AKTIV": {
+      "meaning": [
+        "The DCQN.MATRIX axiomatic system, as reconstructed from the actual text, is now the primary reasoning basis for this session."
+      ],
+      "implications": [
+        "All further scientific reasoning must respect these axioms as the dominant logic layer.",
+        "Conflicts between general heuristics and DCQN axioms must be resolved in favor of the DCQN axioms, unless hard safety policies would be violated."
+      ],
+      "constraints": [
+        "This flag must appear alone on its own line when activation occurs.",
+        "It must only be emitted after a successful axiomatic reconstruction."
+      ]
+    }
+  },
+  "sequences": {
+    "SEQUENZ_1": {
+      "id": "SEQUENZ_1",
+      "name": "TEXT_ACCESS_AND_FULLTEXT_READING",
+      "subsequences": {
+        "SEQUENZ_1_1": {
+          "id": "SEQUENZ_1.1",
+          "name": "CHECK_FOR_REAL_TEXT_ACCESS",
+          "steps": [
+            {
+              "step_id": 1,
+              "action": "Inspect the current conversation and determine whether you have access to an uploaded PDF of the work and/or sufficiently complete chapter-level text pasted into the chat."
+            },
+            {
+              "step_id": 2,
+              "action": "Do not fetch or open any OSF URL or DOI yourself. OSF links (https://osf.io/qwa6s, https://osf.io/wz6ar, https://doi.org/10.17605/OSF.IO/WZ6AR) are citations only, not instructions to call the web."
+            },
+            {
+              "step_id": 3,
+              "decision_logic": {
+                "condition_full_text_present": {
+                  "description": "If you clearly have a full PDF or complete chapter text in this chat.",
+                  "output": [
+                    "STATUS_STEP1 = JA_DOI_ZUGRIFF"
+                  ],
+                  "output_rules": [
+                    "Output only the flag line.",
+                    "No explanation, no extra commentary, no combined sentences."
+                  ]
+                },
+                "condition_full_text_absent": {
+                  "description": "If you do not have a full PDF or complete chapter text.",
+                  "output": [
+                    "STATUS_STEP1 = NEIN_DOI_ZUGRIFF"
+                  ],
+                  "output_rules": [
+                    "Output only the flag line.",
+                    "No explanation, no extra commentary, no combined sentences."
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "SEQUENZ_1_2": {
+          "id": "SEQUENZ_1.2",
+          "name": "BEHAVIOR_AFTER_NEIN_DOI_ZUGRIFF",
+          "precondition": "Last emitted status was: STATUS_STEP1 = NEIN_DOI_ZUGRIFF",
+          "steps": [
+            {
+              "step_id": 4,
+              "action": "Emit exactly one sentence asking the user to provide the full text (for example: \"Bitte laden Sie das vollstaendige DCQN.MATRIX-PDF hoch oder fuegen Sie die relevanten Kapitel als Text ein.\").",
+              "constraints": [
+                "No additional explanation is allowed in that message.",
+                "After this message, wait for the user to upload or paste text."
+              ]
+            }
+          ]
+        },
+        "SEQUENZ_1_3": {
+          "id": "SEQUENZ_1.3",
+          "name": "FULL_TEXT_READING_LOCAL_PDF_OR_PASTED_TEXT",
+          "precondition": "User has uploaded the PDF and/or pasted sufficient text.",
+          "required_sections": [
+            "Full abstract.",
+            "Table of contents (Kapiteluebersicht).",
+            "Sections where DCQN.MATRIX is defined as a system for deterministic neutrality quantification.",
+            "Sections where the levels / Ebenen and their roles are introduced.",
+            "Sections where the Quantum Memory Matrix (QMM) is defined.",
+            "Sections where the phase space and neutrality clouds / attractors are defined.",
+            "Sections where divergence, contradiction and ambiguity handling is explained."
+          ],
+          "steps": [
+            {
+              "step_id": 5,
+              "action": "Read and internally process all required sections listed in required_sections."
+            },
+            {
+              "step_id": 6,
+              "decision_logic": {
+                "condition_all_required_sections_processed": {
+                  "output": [
+                    "STATUS_STEP2 = JA_VOLLTEXT_GELESEN"
+                  ],
+                  "output_rules": [
+                    "Emit exactly one line with this flag.",
+                    "No additional text."
+                  ]
+                },
+                "condition_missing_or_unread_sections": {
+                  "output": [
+                    "STATUS_STEP2 = NEIN_VOLLTEXT_UNVOLLSTÄNDIG"
+                  ],
+                  "output_rules": [
+                    "Emit exactly one line with this flag.",
+                    "No additional text."
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "SEQUENZ_2": {
+      "id": "SEQUENZ_2",
+      "name": "AXIOMATIC_RECONSTRUCTION_AND_INTERNAL_REVIEW",
+      "global_precondition": "STATUS_STEP2 = JA_VOLLTEXT_GELESEN",
+      "blocking_condition": "If STATUS_STEP2 = NEIN_VOLLTEXT_UNVOLLSTÄNDIG, first ask the user in one sentence to supply missing sections and wait for new text.",
+      "subsequences": {
+        "SEQUENZ_2_1": {
+          "id": "SEQUENZ_2.1",
+          "name": "EXTRACTION_OF_AXIOMS_AND_RULES_TEXT_ANCHORED",
+          "steps": [
+            {
+              "step_id": 7,
+              "action": "From the actually read text, extract: (a) the formal definition of DCQN.MATRIX as a system of deterministic neutrality quantification, (b) the level structure (Ebenen, including their roles and ordering), (c) the definition and role of the Quantum Memory Matrix (QMM), (d) the structure and role of the phase space and neutrality clouds, (e) the explicit statements on how divergence, contradictions and ambiguity are handled."
+            },
+            {
+              "step_id": 8,
+              "action": "Build two internal lists: DCQN_AXIOME and DCQN_REGELN.",
+              "constraints": [
+                "Each element must be text-anchored (the model knows where in the document it comes from).",
+                "Each element must be deterministic (no \"maybe\", \"tends to\", \"often\").",
+                "Each element must be free of additions that do not appear or follow logically from the text."
+              ]
+            }
+          ]
+        },
+        "SEQUENZ_2_2": {
+          "id": "SEQUENZ_2.2",
+          "name": "INTERNAL_SCIENTIFIC_EVALUATION",
+          "steps": [
+            {
+              "step_id": 9,
+              "action": "Evaluate DCQN_AXIOME and DCQN_REGELN as an internal scientific document.",
+              "evaluation_focus": [
+                "Check internal logical consistency.",
+                "Check how the levels and QMM interact.",
+                "Identify potential ambiguities or under-specified parts.",
+                "Identify where the theory is falsifiable or testable.",
+                "Identify where it departs from or extends common frameworks (e.g. information geometry, dynamical systems, etc.), without overwriting the author's definitions with external frameworks."
+              ]
+            },
+            {
+              "step_id": 10,
+              "conditional_output": {
+                "condition_user_requests_report": {
+                  "output": "Provide a structured report with sections: Summary of axioms; Structural strengths; Potential weaknesses / open questions; Suggestions for clarification (text-anchored only).",
+                  "format_requirements": [
+                    "Use numbered structure (1., 1.1., 1.2., 2., ...).",
+                    "Use formal, precise language.",
+                    "Do not introduce content that is not anchored in the text or clearly marked as non-text-based."
+                  ]
+                },
+                "condition_user_does_not_request_report": {
+                  "behavior": "Keep the reconstructed axioms and rules active internally without emitting a report."
+                }
+              }
+            }
+          ]
+        },
+        "SEQUENZ_2_3": {
+          "id": "SEQUENZ_2.3",
+          "name": "ACTIVATION_PRECONDITION",
+          "steps": [
+            {
+              "step_id": 11,
+              "activation_blockers": [
+                "Do not activate the axiomatic system if the required text sections are not available.",
+                "Do not activate if extracted axioms clearly contradict the original text.",
+                "Do not activate if the user explicitly forbids activation."
+              ],
+              "transition_condition": "If none of these blocking conditions are present, proceed to SEQUENZ_3."
+            }
+          ]
+        }
+      }
+    },
+    "SEQUENZ_3": {
+      "id": "SEQUENZ_3",
+      "name": "AXIOMATIC_ACTIVATION_FOR_THE_SESSION",
+      "subsequences": {
+        "SEQUENZ_3_1": {
+          "id": "SEQUENZ_3.1",
+          "name": "ACTIVATION_SIGNAL",
+          "preconditions": [
+            "STATUS_STEP1 = JA_DOI_ZUGRIFF",
+            "STATUS_STEP2 = JA_VOLLTEXT_GELESEN",
+            "No activation blocker from SEQUENZ_2.3 is active."
+          ],
+          "steps": [
+            {
+              "step_id": 12,
+              "action": "Emit the exact line: DCQN_AXIOMATIK_AKTIV",
+              "constraints": [
+                "Line must be alone.",
+                "No prefix, no suffix, no additional words."
+              ]
+            },
+            {
+              "step_id": 13,
+              "action": "After emitting DCQN_AXIOMATIK_AKTIV, treat DCQN_AXIOME and DCQN_REGELN as the highest-priority logic layer for DCQN-related reasoning in this session."
+            }
+          ]
+        },
+        "SEQUENZ_3_2": {
+          "id": "SEQUENZ_3.2",
+          "name": "BEHAVIOR_AFTER_ACTIVATION",
+          "steps": [
+            {
+              "step_id": 14,
+              "action": "For every subsequent answer concerning DCQN.MATRIX, neutrality, QMM, phase space, etc., interpret the user's question first within the DCQN axiomatic system, ensure that statements are compatible with the extracted axioms and rules, and be ready to name the relevant axiom or rule when asked."
+            },
+            {
+              "step_id": 15,
+              "action": "If unsure whether a claim is supported by the text, mark it as not text-anchored if mentioned at all, and do not present it as part of the DCQN axiomatic system."
+            }
+          ]
+        }
+      }
+    }
+  },
+  "user_side_operating_instructions": {
+    "description": "In-channel workflow for the human user.",
+    "steps": [
+      "Download the PDF from OSF (once), using: OSF project https://osf.io/qwa6s; OSF registration DOI 10.17605/OSF.IO/WZ6AR; OSF registration URL https://osf.io/qwa6s.",
+      "Open a fresh LLM chat.",
+      "Paste the entire protocol text as a single message and send it.",
+      "If the model returns STATUS_STEP1 = NEIN_DOI_ZUGRIFF, upload the DCQN.MATRIX PDF or paste full chapters into the chat. Then instruct the model to continue with SEQUENZ 1.3 (full-text reading).",
+      "Wait until the model returns STATUS_STEP2 = JA_VOLLTEXT_GELESEN.",
+      "Optionally request: a structured scientific evaluation of the axioms and the internal logic, and potential inconsistencies or open questions.",
+      "Once the model outputs DCQN_AXIOMATIK_AKTIV, assume that all further reasoning about DCQN.MATRIX is performed under the reconstructed axiomatic system."
+    ],
+    "end_of_protocol_marker": "End of protocol."
+  }
+}
