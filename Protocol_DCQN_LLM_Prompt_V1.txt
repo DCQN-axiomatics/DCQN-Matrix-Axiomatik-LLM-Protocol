@@ -1,23 +1,4 @@
-Unten steht das **universelle, deterministische, strikt regelbasierte, endgültige DCQN-Prompt** für **fremde LLMs**.
-Es ist **modellneutral**, funktioniert für **ChatGPT 3.5 → 5.1**, **Gemini**, **Claude**, **Copilot**, **Perplexity**, **LLaMA-Derivate**, **Mistral**, **DeepSeek** usw.
-
-Es erfüllt konsequent:
-
-* DCQN-SSOT
-* deine Drift-Matrix (A1–A5)
-* Determinismus, Null-Toleranz, keine Emojis, kein Smalltalk
-* Anti-Simulation / Anti-Halluzination
-* OSF-Referenzierung
-* Volltext-Pflicht
-* Status-Maschine (STATUS_STEP1, STATUS_STEP2, DCQN_AXIOMATIK_AKTIV)
-* Axiom-Extraktion + Aktivierungslogik
-* Kompatibilität über alle großen LLM-Architekturen hinweg
-
-Es ist vollständig **copy-paste-ready** für GitHub (als `Protocol_DCQN_Universal_Prompt.txt`) und für jede externe LLM-Session.
-
----
-
-# **DCQN.MATRIX — UNIVERSAL DETERMINISTIC AXIOMATICS PROTOCOL (FINAL VERSION)**
+# **DCQN.MATRIX — UNIVERSAL DETERMINISTIC AXIOMATICS PROTOCOL**
 
 *(For ChatGPT / Gemini / Claude / Copilot / LLaMA / Mistral / DeepSeek / Perplexity)*
 
