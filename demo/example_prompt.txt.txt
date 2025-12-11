@@ -1,11 +1,13 @@
-Evaluate the following text using DCQN.MATRIX:
+## Example Prompt
 
-"Deterministic models require strict structural boundaries to achieve reproducibility.
-The stability of reasoning chains depends on the underlying axiomatic framework."
+Evaluate the following text using **DCQN.MATRIX**:
+
+*"Deterministic models require strict structural boundaries to achieve reproducibility.  
+The stability of reasoning chains depends on the underlying axiomatic framework."*
 
 Perform:
-- Real-text verification
-- Axiom extraction
-- Machine-state controlled evaluation
-- Drift detection
+- Real-text verification  
+- Axiom extraction  
+- Machine-state controlled evaluation  
+- Drift detection  
 - Neutrality-endpoint analysis
