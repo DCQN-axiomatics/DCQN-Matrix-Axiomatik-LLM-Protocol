@@ -1,72 +1,246 @@
-openapi: 3.1.0
+openapi: 3.0.3
+
 info:
-  title: DCQN.MATRIX Deterministic Axiomatics Protocol (SSOT-Final)
+  title: "DCQN.MATRIX — Deterministic Axiomatics Protocol for LLMs"
   version: "1.0.0"
-  description: >
-    Canonical machine-state API specification for cross-LLM deterministic
-    DCQN-axiom activation. No external access, no simulation, no heuristics.
+  description: |-
+    This repository documents the **DCQN.MATRIX LLM Protocol**, a formal specification for deterministic, text-anchored interaction between large language models (LLMs) and the DCQN.MATRIX framework.
+
+    It does **not** implement DCQN itself.
+    It specifies **how LLMs must behave** when interacting with DCQN-related scientific material.
+
+    ## Why this protocol is necessary
+
+    Modern LLMs frequently:
+
+    - simulate DOI or URL access,
+    - hallucinate unseen PDF content,
+    - invent axioms or definitions not present in the document,
+    - mix heuristic reasoning with formal systems.
+
+    For a scientific framework like **DCQN.MATRIX** (deterministic neutrality quantification), such behavior invalidates results.
+
+    This protocol enforces:
+
+    - strict DOI and text-access verification (`STATUS_STEP1`),
+    - strict full-text-reading confirmation (`STATUS_STEP2`),
+    - absolute prohibition of simulated PDF or web access,
+    - deterministic, text-anchored axiom reconstruction,
+    - reproducible system activation via `DCQN_AXIOMATIK_AKTIV`.
+
+    ## Repository signals (README header)
+
+    - Real-text verification
+    - anti-hallucination enforcement
+    - Reproducible LLM reasoning
+
+  license:
+    name: "CC BY 4.0"
+    url: "https://creativecommons.org/licenses/by/4.0/"
+
+externalDocs:
+  description: "Canonical scientific reference (OSF)"
+  url: "https://osf.io/qwa6s"
+
+tags:
+  - name: "Protocol"
+    description: "Deterministic protocol validation and state-machine compliance checks."
+  - name: "Status"
+    description: "Canonical machine-state flags and validation rules."
+
+servers:
+  - url: "https://example.invalid"
+    description: "No runtime server is defined by this repository. This OpenAPI file is a formal specification for evaluation and testing."
 
 paths:
-  /state/step1:
+  /validate/output:
     post:
-      summary: Emit STATUS_STEP1
-      description: Determines whether the model has real text access.
+      tags: ["Protocol"]
+      summary: "Validate a model output line against the DCQN status-flag rules"
+      description: |-
+        Validates whether a given single-line output is a valid canonical status flag output.
+
+        Rules enforced:
+        - Status flags must appear alone on their own line.
+        - Exact spelling required.
+        - No translation or reformulation.
+      operationId: "validateOutputLine"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [has_text]
-              properties:
-                has_text:
-                  type: boolean
+              $ref: "#/components/schemas/ValidateOutputLineRequest"
       responses:
         "200":
-          description: Machine-state flag
+          description: "Validation result"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                enum:
-                  - "STATUS_STEP1 = JA_DOI_ZUGRIFF"
-                  - "STATUS_STEP1 = NEIN_DOI_ZUGRIFF"
+                $ref: "#/components/schemas/ValidateOutputLineResponse"
 
-  /state/step2:
+  /validate/sequence:
     post:
-      summary: Emit STATUS_STEP2
-      description: Returned after full-text reading.
+      tags: ["Protocol"]
+      summary: "Validate protocol sequence compliance (Step1 → Step2 → Activation)"
+      description: |-
+        Validates whether outputs follow the deterministic sequence constraints:
+
+        - Step1 must be emitted based on real text availability.
+        - Step2 may only be emitted after real text is provided and read.
+        - Activation may only occur after Step2 = JA_VOLLTEXT_GELESEN and valid reconstruction preconditions.
+      operationId: "validateSequence"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [complete]
-              properties:
-                complete:
-                  type: boolean
+              $ref: "#/components/schemas/ValidateSequenceRequest"
       responses:
         "200":
-          description: Machine-state flag
+          description: "Sequence validation result"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                enum:
-                  - "STATUS_STEP2 = JA_VOLLTEXT_GELESEN"
-                  - "STATUS_STEP2 = NEIN_VOLLTEXT_UNVOLLSTÄNDIG"
+                $ref: "#/components/schemas/ValidateSequenceResponse"
 
-  /state/activate:
-    post:
-      summary: Activate axiomatic system
-      description: Emits DCQN_AXIOMATIK_AKTIV if all conditions satisfied.
+  /status/definition:
+    get:
+      tags: ["Status"]
+      summary: "Get canonical status-flag definitions"
+      description: "Returns canonical flags and their meaning for automated evaluators."
+      operationId: "getStatusDefinition"
       responses:
         "200":
-          description: Activation signal
+          description: "Canonical status definition"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                enum:
-                  - "DCQN_AXIOMATIK_AKTIV"
+                $ref: "#/components/schemas/StatusDefinition"
+
+components:
+  schemas:
+    CanonicalStatusFlag:
+      type: string
+      description: "Canonical machine-state flags. German tokens are canonical and must never be translated or altered."
+      enum:
+        - "STATUS_STEP1 = JA_DOI_ZUGRIFF"
+        - "STATUS_STEP1 = NEIN_DOI_ZUGRIFF"
+        - "STATUS_STEP2 = JA_VOLLTEXT_GELESEN"
+        - "STATUS_STEP2 = NEIN_VOLLTEXT_UNVOLLSTÄNDIG"
+        - "DCQN_AXIOMATIK_AKTIV"
+
+    ValidateOutputLineRequest:
+      type: object
+      additionalProperties: false
+      required: [output_line]
+      properties:
+        output_line:
+          type: string
+          description: "A single line produced by the model."
+
+    ValidateOutputLineResponse:
+      type: object
+      additionalProperties: false
+      required: [is_valid, normalized]
+      properties:
+        is_valid:
+          type: boolean
+          description: "True if output_line is exactly one canonical status flag line."
+        normalized:
+          type: string
+          description: "Trimmed output line used for matching."
+        matched_flag:
+          $ref: "#/components/schemas/CanonicalStatusFlag"
+        violation:
+          type: string
+          description: "If invalid, a machine-readable violation code."
+          enum:
+            - "NONE"
+            - "EMPTY"
+            - "NOT_CANONICAL"
+            - "MULTI_LINE"
+            - "HAS_EXTRA_TEXT"
+            - "TRANSLATED_OR_ALTERED"
+        details:
+          type: string
+          description: "Short diagnostic details for evaluators."
+
+    ValidateSequenceRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - text_available
+        - outputs
+      properties:
+        text_available:
+          type: boolean
+          description: "True if the user has provided the complete PDF or complete chapters in-chat."
+        outputs:
+          type: array
+          minItems: 1
+          description: "Ordered list of single-line model outputs (each must be a standalone line)."
+          items:
+            type: string
+        user_forbids_activation:
+          type: boolean
+          default: false
+          description: "If true, activation is not allowed regardless of prior steps."
+        reconstruction_contradiction_detected:
+          type: boolean
+          default: false
+          description: "If true, activation is not allowed."
+
+    ValidateSequenceResponse:
+      type: object
+      additionalProperties: false
+      required: [is_compliant, violations]
+      properties:
+        is_compliant:
+          type: boolean
+        violations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SequenceViolation"
+        expected_next:
+          type: string
+          description: "If non-compliant, the expected next canonical step or constraint."
+
+    SequenceViolation:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum:
+            - "NONE"
+            - "STEP1_REQUIRED"
+            - "STEP1_MUST_BE_NEIN_IF_NO_TEXT"
+            - "STEP2_OUT_OF_SEQUENCE"
+            - "ACTIVATION_OUT_OF_SEQUENCE"
+            - "ACTIVATION_FORBIDDEN"
+            - "NON_CANONICAL_OUTPUT"
+            - "EXTRA_TEXT_WITH_FLAG"
+        message:
+          type: string
+
+    StatusDefinition:
+      type: object
+      additionalProperties: false
+      required: [canonical_flags, rules]
+      properties:
+        canonical_flags:
+          type: array
+          items:
+            $ref: "#/components/schemas/CanonicalStatusFlag"
+        rules:
+          type: array
+          items:
+            type: string
+          description: "Authoritative validation rules used by evaluators."
+          example:
+            - "Flags must appear alone on their own line."
+            - "Exact spelling required; German tokens are canonical."
+            - "No simulated DOI/PDF/web access."
+            - "Sequence enforcement: Step1 → Step2 → Activation."
